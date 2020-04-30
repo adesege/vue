@@ -3,12 +3,12 @@
 const path = require('path')
 const serialize = require('serialize-javascript')
 
-import { isJS, isCSS } from '../util'
-import TemplateStream from './template-stream'
-import { parseTemplate } from './parse-template'
+import { isCSS, isJS } from '../util'
 import { createMapper } from './create-async-file-mapper'
-import type { ParsedTemplate } from './parse-template'
 import type { AsyncFileMapper } from './create-async-file-mapper'
+import { parseTemplate } from './parse-template'
+import type { ParsedTemplate } from './parse-template'
+import TemplateStream from './template-stream'
 
 type TemplateRendererOptions = {
   template?: string | (content: string, context: any) => string;
@@ -16,6 +16,7 @@ type TemplateRendererOptions = {
   clientManifest?: ClientManifest;
   shouldPreload?: (file: string, type: string) => boolean;
   shouldPrefetch?: (file: string, type: string) => boolean;
+  shouldRenderAsyncScripts?: boolean;
   serializer?: Function;
 };
 
@@ -223,8 +224,7 @@ export default class TemplateRenderer {
   renderScripts (context: Object): string {
     if (this.clientManifest) {
       const initial = this.preloadFiles.filter(({ file }) => isJS(file))
-      const async = (this.getUsedAsyncFiles(context) || []).filter(({ file }) => isJS(file))
-      const needed = [initial[0]].concat(async, initial.slice(1))
+      const async = ((shouldRenderAsyncScripts && this.getUsedAsyncFiles(context)) || []).filter(({ file }) => isJS(file));      const needed = [initial[0]].concat(async, initial.slice(1))
       return needed.map(({ file }) => {
         return `<script src="${this.publicPath}${file}" defer></script>`
       }).join('')

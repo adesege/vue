@@ -1,11 +1,11 @@
 /* @flow */
 
-import RenderStream from './render-stream'
-import { createWriteFunction } from './write'
 import { createRenderFunction } from './render'
-import { createPromiseCallback } from './util'
+import RenderStream from './render-stream'
 import TemplateRenderer from './template-renderer/index'
 import type { ClientManifest } from './template-renderer/index'
+import { createPromiseCallback } from './util'
+import { createWriteFunction } from './write'
 
 export type Renderer = {
   renderToString: (component: Component, context: any, cb: any) => ?Promise<string>;
@@ -28,6 +28,7 @@ export type RenderOptions = {
   basedir?: string;
   shouldPreload?: Function;
   shouldPrefetch?: Function;
+  shouldRenderAsyncScripts?: Boolean;
   clientManifest?: ClientManifest;
   serializer?: Function;
   runInNewContext?: boolean | 'once';
@@ -42,6 +43,7 @@ export function createRenderer ({
   cache,
   shouldPreload,
   shouldPrefetch,
+  shouldRenderAsyncScripts,
   clientManifest,
   serializer
 }: RenderOptions = {}): Renderer {
@@ -51,6 +53,7 @@ export function createRenderer ({
     inject,
     shouldPreload,
     shouldPrefetch,
+    shouldRenderAsyncScripts,
     clientManifest,
     serializer
   })
